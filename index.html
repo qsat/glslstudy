@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script id="fs" type="xs/fs">
+      // フラグメントシェーダには時間の経過がtimeに秒単位で、
+      // スクリーン解像度がresolutionにピクセル単位で入ってくる
+      precision mediump float;
+      uniform float time;
+      uniform vec2  resolution;
+
+      // HSV色空間を使うための関数
+      vec3 hsv(float h, float s, float v){
+        vec4 t = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(vec3(h) + t.xyz) * 6.0 - vec3(t.w));
+        return v * mix(vec3(t.x), clamp(p - vec3(t.x), 0.0, 1.0), s);
+      }
+
+      // ジュリア集合を描くためのフラグメントシェーダ
+      void main(void){
+        vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / max(resolution.x, resolution.y);
+        int j = 0;
+        vec2 x = vec2(-0.345, 0.654);     // この辺変えると……
+        vec2 y = vec2(time * 0.005, 0.0); // いろいろ変わるかも
+        vec2 z = p;
+        for(int i = 0; i < 360; i++){
+          j++;
+          if(length(z) > 2.0){break;}
+          z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + x + y;
+        }
+        float h = abs(mod(time * 15.0 - float(j), 360.0) / 360.0);
+        gl_FragColor = vec4(hsv(h, 1.0, 1.0), 1.0);
+      }
+    </script>
+    <!-- 頂点シェーダのソースコード -->
+    <script id="vs" type="xs/vs">
+      // 頂点シェーダには一切手入れする必要なし
+      attribute vec3 position;
+      void main(void){
+        gl_Position = vec4(position, 1.0);
+      }
+    </script>
+    
+    <style>
+      /* ウィンドウ全体にcanvasをぴったり配置するためのStyle */
+      * {
+        margin:0;
+        padding:0;
+        overflow:hidden;
+      }
+      html,body{
+        height:100%;
+      }
+    </style>
+    <title>your demo title</title>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <script>
+      const WIDTH = window.innerWidth
+      const HEIGHT = window.innerHeight
+
+      let active = false
+
+      const canvas = document.getElementById('c');
+      canvas.width = WIDTH
+      canvas.height = HEIGHT
+
+      const ctx = canvas.getContext('webgl');
+      ctx.viewport(0, 0, canvas.width, canvas.height);
+
+      const program = init(ctx);
+      startRender(ctx, program);
+
+      function init(g){
+        // プログラムオブジェクトの生成
+        const p = g.createProgram();
+        const {
+          VERTEX_SHADER,
+          FRAGMENT_SHADER,
+          LINK_STATUS,
+          STATIC_DRAW,
+          ARRAY_BUFFER,
+          FLOAT,
+        } = g
+
+        // シェーダのコンパイルとリンク
+        g.attachShader(p, createShader(g, VERTEX_SHADER, document.getElementById('vs').text))
+        g.attachShader(p, createShader(g, FRAGMENT_SHADER, document.getElementById('fs').text))
+        g.linkProgram(p)
+
+        // シェーダのリンクステータスをチェック
+        active = g.getProgramParameter(p, LINK_STATUS);
+        // ESCキーで描画を止めるためのイベントハンドラ
+        window.addEventListener('keydown', (h) => {active = (h.keyCode !== 27)}, true)
+
+        // プログラムオブジェクトの有効化
+        g.useProgram(p);
+
+        // VBO用のバッファオブジェクトを生成
+        g.bindBuffer(ARRAY_BUFFER, g.createBuffer());
+
+        // VBOに頂点データを登録
+        g.bufferData(ARRAY_BUFFER, new Float32Array([
+          -1, 1, 0,
+          -1,-1, 0,
+           1, 1, 0,
+           1,-1, 0
+        ]), STATIC_DRAW);
+
+        // attributeロケーション取得
+        const attr = g.getAttribLocation(p, 'position');
+
+        // attribute有効化
+        g.enableVertexAttribArray(attr);
+        g.vertexAttribPointer(attr, 3, FLOAT, false, 0, 0);
+
+        // 初期化時の色を黒に指定
+        g.clearColor(0, 0, 0, 1);
+
+        return p
+      };
+
+      function startRender(g, p, width, height) {
+
+        const { COLOR_BUFFER_BIT, TRIANGLE_STRIP } = g
+        const startedAt = new Date().getTime();
+
+        // uniformLocation格納用にオブジェクトを定義
+        const uniformLocation = {
+          time: g.getUniformLocation(p, 'time'), // uniform変数timeのロケーション取得
+          resolution: g.getUniformLocation(p, 'resolution'), // uniform変数resolutionのロケーション取得
+        };
+
+        (function render() {
+          // if(!active){return;}
+          // 時間の経過を調べる
+          const d = (Date.now() - startedAt) * 0.001;
+
+          // フレームバッファをクリア
+          g.clear(COLOR_BUFFER_BIT);
+
+          // uniform変数をプッシュ
+          g.uniform1f(uniformLocation.time, d);
+          g.uniform2fv(uniformLocation.resolution, [WIDTH, HEIGHT]);
+
+          // プリミティブのレンダリング
+          g.drawArrays(TRIANGLE_STRIP, 0, 4);
+          g.flush();
+
+          requestAnimationFrame(render);
+        })()
+      }
+
+      function createShader(ctx, type, text){
+        const shader = ctx.createShader(type);
+        ctx.shaderSource(shader, text);
+        ctx.compileShader(shader);
+        const err = ctx.getShaderInfoLog(shader)
+        if (err) throw new Error(err)
+        return shader
+      }
+    </script>
+  </body>
+</html>
