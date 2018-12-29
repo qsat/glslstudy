@@ -43,13 +43,6 @@ const fs = `
     // float y = smoothstep(0.2,0.5,st.x);// - smoothstep(0.5,0.8,st.x);
     // float y = mod(st.x,0.5); // return x modulo of 0.5
     // float y = fract(st.x); // return only the fraction part of a number
-    // float y = ceil(st.x);  // nearest integer that is greater than or equal to x
-    // float y = floor(x); // nearest integer less than or equal to x
-    // float y = sign(x);  // extract the sign of x
-    // float y = abs(x);   // return the absolute value of x
-    // float y = clamp(x,0.0,1.0); // constrain x to lie between 0.0 and 1.0
-    // float y = min(0.0,x);   // return the lesser of x and 0.0
-    // float y = max(0.0,x);   // return the greater of x and 0.0 
 
     vec3 color = vec3(1.0, 1.0, y);
 
