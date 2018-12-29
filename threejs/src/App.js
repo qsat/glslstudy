@@ -39,8 +39,6 @@ const fs = `
     // float y = step(0.5,st.x);
     float y = smoothstep(0.1,0.9,st.x);
     // float y = smoothstep(0.2,0.5,st.x);// - smoothstep(0.5,0.8,st.x);
-    // float y = mod(st.x,0.5); // return x modulo of 0.5
-    // float y = fract(st.x); // return only the fraction part of a number
 
     vec3 color = vec3(1.0, 1.0, y);
 
