@@ -16,7 +16,7 @@ const vs = `
   }
 `
 
-const fs = require('./fs/01_line').default
+const fs = require('./fs/02_colors').default
 
 class App extends Component {
   componentDidMount() {
@@ -30,7 +30,7 @@ class App extends Component {
     animate();
 
     function init() {
-      camera.position.z = 1;
+      camera.position.z = 1
       var geometry = new PlaneBufferGeometry( 2, 2 );
 
       uniforms = {
