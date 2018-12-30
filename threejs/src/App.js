@@ -16,7 +16,7 @@ const vs = `
   }
 `
 
-const fs = require('./fs/colors_02').default
+const fs = require('./fs/colors_04').default
 
 class App extends Component {
   componentDidMount() {
