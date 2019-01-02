@@ -22,9 +22,10 @@ void main(){
     vec2 tr = step(vec2(0.1),1.0-st);
     pct *= tr.x * tr.y;
 
-    vec2 tr2 = 1.0 - step(vec2(0.05), 1.0-st);
+    // 輪郭だけ残す
+    vec2 tr2 = 1.0 - step(vec2(0.099), 1.0-st);
     pct += tr2.x + tr2.y;
-    vec2 bl2 = 1.0 - step(vec2(0.05), st);
+    vec2 bl2 = 1.0 - step(vec2(0.099), st);
     pct += bl2.x + bl2.y;
 
     color = vec3(pct);
