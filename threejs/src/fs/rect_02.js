@@ -17,16 +17,17 @@ void main(){
     // bottom-left
     vec2 bl = step(vec2(0.1),st);
     float pct = bl.x * bl.y;
-    vec2 bl2 = 1.0 - step(vec2(0.05), st);
-    pct += bl2.x + bl2.y;
 
     // top-right
     vec2 tr = step(vec2(0.1),1.0-st);
     pct *= tr.x * tr.y;
+
     vec2 tr2 = 1.0 - step(vec2(0.05), 1.0-st);
     pct += tr2.x + tr2.y;
+    vec2 bl2 = 1.0 - step(vec2(0.05), st);
+    pct += bl2.x + bl2.y;
 
-    color = vec3(pct, pct, 0.5);
+    color = vec3(pct);
 
     gl_FragColor = vec4(color,1.0);
 }
