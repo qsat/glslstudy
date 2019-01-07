@@ -17,8 +17,8 @@ void main(){
   st = st *2.-1.;
 
   // Make the distance field
-  d = length( abs(st)-.3 );
-  // d = length( min(abs(st)-.3,0.) );
+  d = length( abs(st)-vec2(.3, .3) );
+  // d = length( min(abs(st)-.3, 0.) );
   // d = length( max(abs(st)-.3,0.) );
 
   // Visualize the distance field
