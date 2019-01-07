@@ -16,7 +16,7 @@ const vs = `
   }
 `
 
-const fs = require('./fs/rect_03').default
+const fs = require('./fs/polar_01').default
 
 class App extends Component {
   componentDidMount() {
